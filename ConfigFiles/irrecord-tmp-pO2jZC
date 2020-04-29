@@ -1,0 +1,39 @@
+
+# Please take the time to finish this file as described in
+# https://sourceforge.net/p/lirc-remotes/wiki/Checklist/
+# and make it available to others by sending it to
+# <lirc@bartelmus.de>
+#
+# This config file was automatically generated
+# using lirc-0.10.1(default) on Wed Feb  5 12:52:04 2020
+# Command line used: -d /dev/lirc1 /home/pi/lircd.conf
+# Kernel version (uname -r): 4.19.93-v7+
+#
+# Remote name (as of config file): WESTINGHOUSE
+# Brand of remote device, the thing you hold in your hand:
+# Remote device model nr:
+# Remote device info url:
+# Does remote device has a bundled capture device e. g., a
+#     usb dongle? :
+# For bundled USB devices: usb vendor id, product id
+#     and device string (use dmesg or lsusb):
+# Type of device controlled
+#     (TV, VCR, Audio, DVD, Satellite, Cable, HTPC, ...) :
+# Device(s) controlled by this remote:
+
+begin remote
+
+  name  WESTINGHOUSE
+  bits           12
+  flags CONST_LENGTH
+  eps            30
+  aeps          100
+
+  header       2433   543
+  one          1260   551
+  zero          611   551
+  gap          44786
+  toggle_bit_mask 0x0
+  frequency    38000
+
+      begin codes

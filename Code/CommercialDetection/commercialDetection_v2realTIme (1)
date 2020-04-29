@@ -1,0 +1,66 @@
+import time
+import os
+import struct
+import pyaudio
+import numpy as np
+
+# constants
+CHUNK = 1024             # samples per frame
+FORMAT = pyaudio.paFloat32     # audio format (bytes per sample?)
+CHANNELS = 1                 # single channel for microphone
+RATE = 44100                 # samples per second
+
+# pyaudio class instance
+p = pyaudio.PyAudio()
+
+# stream object to get data from microphone
+stream = p.open(
+    format=FORMAT,
+    channels=CHANNELS,
+    rate=RATE,
+    input=True,
+    output=True,
+    frames_per_buffer=CHUNK
+)
+
+print('stream started')
+average = []
+falsep = []
+i=0
+j=0
+dflag = 0
+
+while True:
+    # binary data
+    data = stream.read(CHUNK, exception_on_overflow=False)
+    # convert data to integers, make np array, then offset it by 127
+    decoded = np.fromstring(data, 'Float32')
+
+    decodedsquared = decoded * decoded * 10000
+    logrules = (np.log2((decodedsquared * 100 + 1)) / np.log2(4)) * 10
+    volume = np.round(np.mean(logrules))
+    print(volume)
+
+    #SILENT FRAME DETECTION
+    average.append(volume)
+    falsep.append(volume)
+    if i % 2 == 0:
+        if np.max(average) < 20 and np.min(average) == 0:
+            i = 0
+            dflag = 1
+            average.clear()
+            print("===========================================\nSILENT FRAME DETECTED\n==================================")
+            time.sleep(1)
+        average.clear()
+    i = i + 1
+
+    #FALSE-POSITIVE PREVENTION
+    if j % 4 == 0:
+        if dflag == 1 and np.mean(falsep) > 50:
+            dflag = 0
+            print('===========================================\nFALSE POSITIVE DETECTED\n==================================')
+            falsep.clear()
+        falsep.clear()
+    j = j + 1
+
+
